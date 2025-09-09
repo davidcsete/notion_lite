@@ -3078,3 +3078,168 @@ Processing by Api::V1::NotesController#index as JSON
 Completed 200 OK in 34ms (Views: 0.2ms | ActiveRecord: 9.2ms (6 queries, 0 cached) | GC: 10.4ms)
 
 
+Started GET "/" for ::1 at 2025-09-05 10:39:58 +0300
+Processing by Rails::WelcomeController#index as HTML
+  Rendering /Users/david/.asdf/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/railties-8.0.2.1/lib/rails/templates/rails/welcome/index.html.erb
+  Rendered /Users/david/.asdf/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/railties-8.0.2.1/lib/rails/templates/rails/welcome/index.html.erb (Duration: 0.5ms | GC: 0.0ms)
+Completed 200 OK in 3ms (Views: 1.4ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/" for ::1 at 2025-09-09 13:07:05 +0300
+Processing by Rails::WelcomeController#index as HTML
+  Rendering /Users/david/.asdf/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/railties-8.0.2.1/lib/rails/templates/rails/welcome/index.html.erb
+  Rendered /Users/david/.asdf/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/railties-8.0.2.1/lib/rails/templates/rails/welcome/index.html.erb (Duration: 0.1ms | GC: 0.0ms)
+Completed 200 OK in 2ms (Views: 1.0ms | ActiveRecord: 0.0ms (0 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/api/v1/auth/me" for ::1 at 2025-09-09 13:07:07 +0300
+Processing by Api::V1::SessionsController#show as JSON
+  [1m[36mUser Load (241.5ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 LIMIT 1 /*action='show',application='CollaborationApp',controller='sessions'*/[0m
+  ↳ app/controllers/application_controller.rb:7:in 'ApplicationController#current_user'
+Completed 200 OK in 260ms (Views: 0.1ms | ActiveRecord: 257.5ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/api/v1/notes" for ::1 at 2025-09-09 13:07:07 +0300
+Processing by Api::V1::NotesController#index as JSON
+  [1m[36mUser Load (1.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 LIMIT 1 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/application_controller.rb:7:in 'ApplicationController#current_user'
+  [1m[36mNote Load (3.0ms)[0m  [1m[34mSELECT DISTINCT "notes".* FROM "notes" LEFT JOIN collaborations ON notes.id = collaborations.note_id WHERE (notes.owner_id = 5 OR collaborations.user_id = 5) /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mUser Load (0.7ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mCollaboration Load (0.6ms)[0m  [1m[34mSELECT "collaborations".* FROM "collaborations" WHERE "collaborations"."note_id" IN (7, 6) /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mUser Count (1.0ms)[0m  [1m[34mSELECT COUNT(*) FROM "users" INNER JOIN "collaborations" ON "users"."id" = "collaborations"."user_id" WHERE "collaborations"."note_id" = 7 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:77:in 'Api::V1::NotesController#note_json'
+  [1m[36mUser Count (1.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "users" INNER JOIN "collaborations" ON "users"."id" = "collaborations"."user_id" WHERE "collaborations"."note_id" = 6 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:77:in 'Api::V1::NotesController#note_json'
+Completed 200 OK in 22ms (Views: 0.1ms | ActiveRecord: 8.5ms (6 queries, 0 cached) | GC: 0.6ms)
+
+
+  [1m[36mTRANSACTION (1.1ms)[0m  [1m[35mBEGIN /*application='CollaborationApp'*/[0m
+  [1m[36mUser Exists? (3.6ms)[0m  [1m[34mSELECT 1 AS one FROM "users" WHERE "users"."email" = 'test@example.com' LIMIT 1 /*application='CollaborationApp'*/[0m
+  [1m[36mUser Create (1.3ms)[0m  [1m[32mINSERT INTO "users" ("email", "name", "avatar_url", "password_digest", "created_at", "updated_at") VALUES ('test@example.com', 'Test User', NULL, '$2a$12$NBU6klwBMUDBc1TpB/GhpeGuthA770w29XCT16hHCieY8E.SG/n4u', '2025-09-09 10:27:04.416379', '2025-09-09 10:27:04.416379') RETURNING "id" /*application='CollaborationApp'*/[0m
+  [1m[36mTRANSACTION (1.1ms)[0m  [1m[35mCOMMIT /*application='CollaborationApp'*/[0m
+  [1m[36mTRANSACTION (0.4ms)[0m  [1m[35mBEGIN /*application='CollaborationApp'*/[0m
+  [1m[36mNote Create (2.0ms)[0m  [1m[32mINSERT INTO "notes" ("title", "content", "owner_id", "document_state", "created_at", "updated_at") VALUES ('Test Note', '{"type":"doc","content":[]}', 6, '{"version":0,"operations":[]}', '2025-09-09 10:27:04.430132', '2025-09-09 10:27:04.430132') RETURNING "id" /*application='CollaborationApp'*/[0m
+  [1m[36mTRANSACTION (0.9ms)[0m  [1m[35mCOMMIT /*application='CollaborationApp'*/[0m
+Started GET "/api/v1/auth/me" for ::1 at 2025-09-09 13:27:27 +0300
+Processing by Api::V1::SessionsController#show as JSON
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 LIMIT 1 /*action='show',application='CollaborationApp',controller='sessions'*/[0m
+  ↳ app/controllers/application_controller.rb:7:in 'ApplicationController#current_user'
+Completed 200 OK in 88ms (Views: 0.1ms | ActiveRecord: 3.8ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/api/v1/notes" for ::1 at 2025-09-09 13:27:27 +0300
+Processing by Api::V1::NotesController#index as JSON
+  [1m[36mUser Load (0.6ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 LIMIT 1 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/application_controller.rb:7:in 'ApplicationController#current_user'
+  [1m[36mNote Load (1.1ms)[0m  [1m[34mSELECT DISTINCT "notes".* FROM "notes" LEFT JOIN collaborations ON notes.id = collaborations.note_id WHERE (notes.owner_id = 5 OR collaborations.user_id = 5) /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mUser Load (0.3ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mCollaboration Load (0.3ms)[0m  [1m[34mSELECT "collaborations".* FROM "collaborations" WHERE "collaborations"."note_id" IN (7, 6) /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mUser Count (0.3ms)[0m  [1m[34mSELECT COUNT(*) FROM "users" INNER JOIN "collaborations" ON "users"."id" = "collaborations"."user_id" WHERE "collaborations"."note_id" = 7 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:77:in 'Api::V1::NotesController#note_json'
+  [1m[36mUser Count (0.2ms)[0m  [1m[34mSELECT COUNT(*) FROM "users" INNER JOIN "collaborations" ON "users"."id" = "collaborations"."user_id" WHERE "collaborations"."note_id" = 6 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:77:in 'Api::V1::NotesController#note_json'
+Completed 200 OK in 11ms (Views: 0.1ms | ActiveRecord: 3.0ms (6 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/api/v1/auth/me" for ::1 at 2025-09-09 14:01:53 +0300
+Processing by Api::V1::SessionsController#show as JSON
+  [1m[36mUser Load (130.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 LIMIT 1 /*action='show',application='CollaborationApp',controller='sessions'*/[0m
+  ↳ app/controllers/application_controller.rb:7:in 'ApplicationController#current_user'
+Completed 200 OK in 136ms (Views: 0.1ms | ActiveRecord: 138.6ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/api/v1/notes" for ::1 at 2025-09-09 14:01:53 +0300
+Processing by Api::V1::NotesController#index as JSON
+  [1m[36mUser Load (1.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 LIMIT 1 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/application_controller.rb:7:in 'ApplicationController#current_user'
+  [1m[36mNote Load (3.5ms)[0m  [1m[34mSELECT DISTINCT "notes".* FROM "notes" LEFT JOIN collaborations ON notes.id = collaborations.note_id WHERE (notes.owner_id = 5 OR collaborations.user_id = 5) /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mUser Load (1.0ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mCollaboration Load (3.7ms)[0m  [1m[34mSELECT "collaborations".* FROM "collaborations" WHERE "collaborations"."note_id" IN (7, 6) /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mUser Count (1.0ms)[0m  [1m[34mSELECT COUNT(*) FROM "users" INNER JOIN "collaborations" ON "users"."id" = "collaborations"."user_id" WHERE "collaborations"."note_id" = 7 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:77:in 'Api::V1::NotesController#note_json'
+  [1m[36mUser Count (0.6ms)[0m  [1m[34mSELECT COUNT(*) FROM "users" INNER JOIN "collaborations" ON "users"."id" = "collaborations"."user_id" WHERE "collaborations"."note_id" = 6 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:77:in 'Api::V1::NotesController#note_json'
+Completed 200 OK in 19ms (Views: 0.1ms | ActiveRecord: 11.5ms (6 queries, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/api/v1/auth/me" for ::1 at 2025-09-09 14:44:41 +0300
+Processing by Api::V1::SessionsController#show as JSON
+  [1m[36mUser Load (169.0ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 LIMIT 1 /*action='show',application='CollaborationApp',controller='sessions'*/[0m
+  ↳ app/controllers/application_controller.rb:7:in 'ApplicationController#current_user'
+Completed 200 OK in 189ms (Views: 0.8ms | ActiveRecord: 178.8ms (1 query, 0 cached) | GC: 1.8ms)
+
+
+Started GET "/api/v1/notes" for ::1 at 2025-09-09 14:44:41 +0300
+Processing by Api::V1::NotesController#index as JSON
+  [1m[36mUser Load (1.2ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 LIMIT 1 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/application_controller.rb:7:in 'ApplicationController#current_user'
+  [1m[36mNote Load (3.7ms)[0m  [1m[34mSELECT DISTINCT "notes".* FROM "notes" LEFT JOIN collaborations ON notes.id = collaborations.note_id WHERE (notes.owner_id = 5 OR collaborations.user_id = 5) /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mUser Load (0.7ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mCollaboration Load (0.8ms)[0m  [1m[34mSELECT "collaborations".* FROM "collaborations" WHERE "collaborations"."note_id" IN (7, 6) /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mUser Count (1.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "users" INNER JOIN "collaborations" ON "users"."id" = "collaborations"."user_id" WHERE "collaborations"."note_id" = 7 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:77:in 'Api::V1::NotesController#note_json'
+  [1m[36mUser Count (1.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "users" INNER JOIN "collaborations" ON "users"."id" = "collaborations"."user_id" WHERE "collaborations"."note_id" = 6 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:77:in 'Api::V1::NotesController#note_json'
+Completed 200 OK in 16ms (Views: 0.1ms | ActiveRecord: 9.3ms (6 queries, 0 cached) | GC: 0.7ms)
+
+
+Started GET "/api/v1/auth/me" for ::1 at 2025-09-09 15:26:26 +0300
+Processing by Api::V1::SessionsController#show as JSON
+  [1m[36mUser Load (256.8ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 LIMIT 1 /*action='show',application='CollaborationApp',controller='sessions'*/[0m
+  ↳ app/controllers/application_controller.rb:7:in 'ApplicationController#current_user'
+Completed 200 OK in 267ms (Views: 0.6ms | ActiveRecord: 263.6ms (1 query, 0 cached) | GC: 0.2ms)
+
+
+Started GET "/api/v1/notes" for ::1 at 2025-09-09 15:26:26 +0300
+Processing by Api::V1::NotesController#index as JSON
+  [1m[36mUser Load (1.6ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 LIMIT 1 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/application_controller.rb:7:in 'ApplicationController#current_user'
+  [1m[36mNote Load (3.8ms)[0m  [1m[34mSELECT DISTINCT "notes".* FROM "notes" LEFT JOIN collaborations ON notes.id = collaborations.note_id WHERE (notes.owner_id = 5 OR collaborations.user_id = 5) /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mUser Load (1.1ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mCollaboration Load (0.5ms)[0m  [1m[34mSELECT "collaborations".* FROM "collaborations" WHERE "collaborations"."note_id" IN (7, 6) /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mUser Count (1.3ms)[0m  [1m[34mSELECT COUNT(*) FROM "users" INNER JOIN "collaborations" ON "users"."id" = "collaborations"."user_id" WHERE "collaborations"."note_id" = 7 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:77:in 'Api::V1::NotesController#note_json'
+  [1m[36mUser Count (1.4ms)[0m  [1m[34mSELECT COUNT(*) FROM "users" INNER JOIN "collaborations" ON "users"."id" = "collaborations"."user_id" WHERE "collaborations"."note_id" = 6 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:77:in 'Api::V1::NotesController#note_json'
+Completed 200 OK in 24ms (Views: 0.1ms | ActiveRecord: 9.9ms (6 queries, 0 cached) | GC: 1.0ms)
+
+
+Started GET "/api/v1/auth/me" for ::1 at 2025-09-09 15:37:10 +0300
+Processing by Api::V1::SessionsController#show as JSON
+  [1m[36mUser Load (40.0ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 LIMIT 1 /*action='show',application='CollaborationApp',controller='sessions'*/[0m
+  ↳ app/controllers/application_controller.rb:7:in 'ApplicationController#current_user'
+Completed 200 OK in 79ms (Views: 1.3ms | ActiveRecord: 40.1ms (1 query, 0 cached) | GC: 0.0ms)
+
+
+Started GET "/api/v1/notes" for ::1 at 2025-09-09 15:37:10 +0300
+Processing by Api::V1::NotesController#index as JSON
+  [1m[36mUser Load (21.5ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 LIMIT 1 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/application_controller.rb:7:in 'ApplicationController#current_user'
+  [1m[36mNote Load (10.1ms)[0m  [1m[34mSELECT DISTINCT "notes".* FROM "notes" LEFT JOIN collaborations ON notes.id = collaborations.note_id WHERE (notes.owner_id = 5 OR collaborations.user_id = 5) /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mUser Load (4.6ms)[0m  [1m[34mSELECT "users".* FROM "users" WHERE "users"."id" = 5 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mCollaboration Load (4.6ms)[0m  [1m[34mSELECT "collaborations".* FROM "collaborations" WHERE "collaborations"."note_id" IN (7, 6) /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:8:in 'Enumerable#map'
+  [1m[36mUser Count (3.9ms)[0m  [1m[34mSELECT COUNT(*) FROM "users" INNER JOIN "collaborations" ON "users"."id" = "collaborations"."user_id" WHERE "collaborations"."note_id" = 7 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:77:in 'Api::V1::NotesController#note_json'
+  [1m[36mUser Count (13.1ms)[0m  [1m[34mSELECT COUNT(*) FROM "users" INNER JOIN "collaborations" ON "users"."id" = "collaborations"."user_id" WHERE "collaborations"."note_id" = 6 /*action='index',application='CollaborationApp',controller='notes'*/[0m
+  ↳ app/controllers/api/v1/notes_controller.rb:77:in 'Api::V1::NotesController#note_json'
+Completed 200 OK in 112ms (Views: 0.3ms | ActiveRecord: 56.8ms (6 queries, 0 cached) | GC: 1.4ms)
+
+
