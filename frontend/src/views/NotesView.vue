@@ -71,112 +71,21 @@
         </ul>
       </div>
 
-      <!-- Loading State -->
-      <div v-if="loading" class="flex justify-center items-center py-12">
-        <span class="loading loading-spinner loading-lg"></span>
-      </div>
-
-      <!-- Notes Grid -->
-      <div
-        v-else-if="filteredNotes.length > 0"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-      >
-        <div
-          v-for="note in filteredNotes"
-          :key="note.id"
-          class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow"
-        >
-          <div class="card-body">
-            <div class="flex justify-between items-start mb-2">
-              <h2 class="card-title text-lg">{{ note.title }}</h2>
-              <div class="dropdown dropdown-end">
-                <div tabindex="0" role="button" class="btn btn-ghost btn-sm btn-circle">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
-                    />
-                  </svg>
-                </div>
-                <ul
-                  tabindex="0"
-                  class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 z-10"
-                >
-                  <li><a @click="openNote(note.id)">Open</a></li>
-                  <li v-if="note.user_role === 'owner'">
-                    <a @click="showCollaborators(note)">Manage Collaborators</a>
-                  </li>
-                  <li v-if="note.user_role === 'owner'">
-                    <a @click="deleteNote(note.id)" class="text-error">Delete</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-2 mb-3">
-              <div class="badge badge-outline">{{ note.user_role }}</div>
-              <div
-                v-if="note.collaborators_count && note.collaborators_count > 0"
-                class="badge badge-secondary"
-              >
-                {{ note.collaborators_count }} collaborator{{
-                  note.collaborators_count > 1 ? "s" : ""
-                }}
-              </div>
-            </div>
-
-            <p class="text-sm text-base-content/60 mb-4">
-              Last updated {{ formatDate(note.updated_at) }}
-            </p>
-
-            <div class="card-actions justify-end">
-              <button @click="openNote(note.id)" class="btn btn-primary btn-sm">Open</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Empty State -->
-      <div v-else class="col-span-full">
-        <div class="card bg-base-100 shadow-xl">
-          <div class="card-body text-center py-12">
-            <div class="text-6xl mb-4">📄</div>
-            <h3 class="text-2xl font-bold mb-2">No notes found</h3>
-            <p class="text-base-content/60 mb-6">
-              Create your first note to get started with collaborative editing
-            </p>
-            <button @click="showCreateModal = true" class="btn btn-primary">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5 mr-2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Create Note
-            </button>
-          </div>
-        </div>
-      </div>
+      <!-- Notes List Component -->
+      <NotesList
+        :notes="notes"
+        :loading="loading"
+        :search-query="searchQuery"
+        @open-note="openNote"
+        @delete-note="handleDeleteNote"
+        @manage-collaborators="showCollaborators"
+        @create-note="showCreateModal = true"
+      />
     </div>
 
     <!-- Create Note Modal -->
-    <div v-if="showCreateModal" class="modal modal-open">
+    <Transition name="modal" appear>
+      <div v-if="showCreateModal" class="modal modal-open">
       <div class="modal-box">
         <h3 class="font-bold text-lg mb-4">Create New Note</h3>
         <form @submit.prevent="createNote">
@@ -201,10 +110,12 @@
           </div>
         </form>
       </div>
-    </div>
+      </div>
+    </Transition>
 
     <!-- Collaborators Modal -->
-    <div v-if="showCollaboratorsModal" class="modal modal-open">
+    <Transition name="modal" appear>
+      <div v-if="showCollaboratorsModal" class="modal modal-open">
       <div class="modal-box max-w-2xl">
         <h3 class="font-bold text-lg mb-4">Manage Collaborators - {{ selectedNote?.title }}</h3>
 
@@ -275,7 +186,8 @@
           <button @click="closeCollaboratorsModal" class="btn">Close</button>
         </div>
       </div>
-    </div>
+      </div>
+    </Transition>
 
     <!-- Toast Component -->
     <Toast />
@@ -287,14 +199,17 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useToastStore } from "@/stores/toast";
+import { useViewTransitions } from "@/composables/useViewTransitions";
 import apiService, { type Note } from "@/services/api";
 import Toast from "@/components/Toast.vue";
 import CollaboratorForm from "@/components/CollaboratorForm.vue";
+import NotesList from "@/components/NotesList.vue";
 import { useCollaborations } from "@/composables/useCollaborations";
 
 const router = useRouter();
 const authStore = useAuthStore();
 const toastStore = useToastStore();
+const { navigateWithTransition } = useViewTransitions(router);
 
 // Use collaborations composable
 const {
@@ -323,13 +238,7 @@ const newNote = ref({
   title: "",
 });
 
-// Computed properties
-const filteredNotes = computed(() => {
-  if (!searchQuery.value) return notes.value;
-  return notes.value.filter((note) =>
-    note.title.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
-});
+// Remove filteredNotes computed since it's now handled in NotesList component
 
 // Methods
 async function loadNotes() {
@@ -375,14 +284,10 @@ async function createNote() {
   }
 }
 
-async function deleteNote(noteId: number) {
-  if (!confirm("Are you sure you want to delete this note? This action cannot be undone.")) {
-    return;
-  }
-
+async function handleDeleteNote(note: Note) {
   try {
-    await apiService.deleteNote(noteId);
-    notes.value = notes.value.filter((note) => note.id !== noteId);
+    await apiService.deleteNote(note.id);
+    notes.value = notes.value.filter((n) => n.id !== note.id);
     toastStore.showToast("Note deleted successfully!", "success");
   } catch (error: unknown) {
     console.error("Failed to delete note:", error);
@@ -392,7 +297,11 @@ async function deleteNote(noteId: number) {
 }
 
 function openNote(noteId: number) {
-  router.push(`/notes/${noteId}`);
+  navigateWithTransition(`/notes/${noteId}`, {
+    name: 'editor',
+    direction: 'forward',
+    type: 'scale'
+  });
 }
 
 async function showCollaborators(note: Note) {
@@ -441,22 +350,7 @@ function closeCollaboratorsModal() {
   collaborations.value = [];
 }
 
-function formatDate(dateString: string) {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-
-  if (diffInHours < 1) {
-    return "Just now";
-  } else if (diffInHours < 24) {
-    return `${Math.floor(diffInHours)} hour${Math.floor(diffInHours) > 1 ? "s" : ""} ago`;
-  } else if (diffInHours < 24 * 7) {
-    const days = Math.floor(diffInHours / 24);
-    return `${days} day${days > 1 ? "s" : ""} ago`;
-  } else {
-    return date.toLocaleDateString();
-  }
-}
+// formatDate function moved to NotesList component
 
 async function handleLogout() {
   const result = await authStore.logout();

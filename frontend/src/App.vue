@@ -1,10 +1,29 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
-import { onMounted } from 'vue'
+import { RouterView, useRoute, useRouter } from 'vue-router'
+import { onMounted, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useViewTransitions } from '@/composables/useViewTransitions'
 import Toast from '@/components/Toast.vue'
+import PageTransition from '@/components/PageTransition.vue'
 
 const authStore = useAuthStore()
+const route = useRoute()
+const router = useRouter()
+const { supportsViewTransitions, getTransitionDirection } = useViewTransitions()
+
+const transitionDirection = ref<'forward' | 'back'>('forward')
+const previousRoute = ref<string>('')
+
+// Watch route changes to determine transition direction
+watch(
+  () => route.path,
+  (to, from) => {
+    if (from && to !== from) {
+      transitionDirection.value = getTransitionDirection(to, from)
+      previousRoute.value = from
+    }
+  }
+)
 
 onMounted(async () => {
   // Try to restore user session on app load
@@ -14,7 +33,22 @@ onMounted(async () => {
 
 <template>
   <div id="app" data-theme="light">
-    <RouterView />
+    <!-- Use native view transitions if supported, otherwise use Vue transitions -->
+    <template v-if="supportsViewTransitions">
+      <RouterView v-slot="{ Component, route: currentRoute }">
+        <component :is="Component" :key="currentRoute.path" />
+      </RouterView>
+    </template>
+    
+    <!-- Fallback Vue transitions for browsers without View Transitions API -->
+    <template v-else>
+      <RouterView v-slot="{ Component, route: currentRoute }">
+        <PageTransition :direction="transitionDirection">
+          <component :is="Component" :key="currentRoute.path" />
+        </PageTransition>
+      </RouterView>
+    </template>
+    
     <Toast />
   </div>
 </template>

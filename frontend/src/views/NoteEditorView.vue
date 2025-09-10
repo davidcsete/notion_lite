@@ -112,13 +112,13 @@
           
           <!-- Editor Area -->
           <div class="flex-1">
-            <textarea 
-              v-model="noteContent"
-              @input="handleContentChange"
-              class="textarea textarea-ghost w-full h-96 text-lg leading-relaxed resize-none"
-              placeholder="Start typing your note here..."
-              :disabled="!canEdit"
-            ></textarea>
+            <NoteEditor
+              :note-id="note.id"
+              :initial-content="noteContent"
+              :can-edit="canEdit"
+              @content-change="handleContentChange"
+              @save="handleSave"
+            />
           </div>
           
           <!-- Status Bar -->
@@ -216,6 +216,7 @@ import { useToastStore } from '@/stores/toast'
 import apiService, { type Note } from '@/services/api'
 import Toast from '@/components/Toast.vue'
 import CollaboratorForm from '@/components/CollaboratorForm.vue'
+import NoteEditor from '@/components/NoteEditor.vue'
 import { useCollaborations } from '@/composables/useCollaborations'
 
 const router = useRouter()
@@ -290,7 +291,7 @@ async function loadNote() {
         await loadCollaborations(note.value.id)
       }
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to load note:', error)
     if (error.response?.status === 404) {
       toastStore.showToast('Note not found', 'error')
@@ -316,8 +317,10 @@ function extractTextContent(content: Record<string, unknown>): string {
   return ''
 }
 
-function handleContentChange() {
+function handleContentChange(newContent: string) {
   if (!canEdit.value) return
+  
+  noteContent.value = newContent
   
   // Clear existing timeout
   if (saveTimeout.value) {
@@ -331,6 +334,11 @@ function handleContentChange() {
   saveTimeout.value = setTimeout(() => {
     saveNote()
   }, 1000)
+}
+
+function handleSave(content: string) {
+  noteContent.value = content
+  saveNote()
 }
 
 async function saveNote() {

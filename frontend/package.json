@@ -16,6 +16,7 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
+    "@rails/actioncable": "^8.0.201",
     "axios": "^1.11.0",
     "pinia": "^3.0.3",
     "tailwindcss": "^4.1.12",
